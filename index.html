@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Europe Tierlist</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🇪🇺</text></svg>">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>🇪🇺 Europe Tierlist</h1>
+    <nav id="tabs"></nav>
+    <div class="actions">
+      <button id="btn-export" title="Baixar o estado como JSON">Exportar</button>
+      <button id="btn-import" title="Restaurar estado de um JSON exportado">Importar</button>
+      <button id="btn-reset" class="danger" title="Apagar tudo e recomeçar">Resetar</button>
+      <input type="file" id="import-file" accept="application/json,.json" hidden>
+    </div>
+  </header>
+  <main id="view"></main>
+  <script src="data/places.js"></script>
+  <script src="vendor/Sortable.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
