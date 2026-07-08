@@ -90,6 +90,10 @@
     return new Set(TIER_KEYS.flatMap(k => profile.tiers[k]));
   }
 
+  function rankedCount(profile) {
+    return TIER_KEYS.reduce((n, k) => n + profile.tiers[k].length, 0);
+  }
+
   function tierIndexMap(profile) {
     const map = new Map();
     TIER_KEYS.forEach((k, i) => profile.tiers[k].forEach(id => map.set(id, i)));
@@ -371,9 +375,24 @@
     importFile.value = '';
     if (!file) return;
     try {
-      const parsed = sanitizeState(JSON.parse(await file.text()));
-      if (!parsed) throw new Error('estrutura inválida');
-      state = parsed;
+      const incoming = sanitizeState(JSON.parse(await file.text()));
+      if (!incoming) throw new Error('estrutura inválida');
+      const hasLocal = state.profiles.some(p => rankedCount(p) > 0);
+      if (
+        hasLocal &&
+        confirm(
+          'Mesclar com as tierlists atuais?\n\n' +
+            'OK = mesclar: para cada perfil, vale a versão com mais locais rankeados ' +
+            '(ideal para importar a tierlist da outra pessoa sem perder a sua).\n' +
+            'Cancelar = substituir tudo pelo arquivo.'
+        )
+      ) {
+        state.profiles = state.profiles.map((local, i) =>
+          rankedCount(incoming.profiles[i]) > rankedCount(local) ? incoming.profiles[i] : local
+        );
+      } else {
+        state = incoming;
+      }
       save();
       activeTab = 0;
       render();
