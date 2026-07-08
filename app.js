@@ -157,13 +157,17 @@
 
   // ---------- Cards ----------
 
+  function placeName(place) {
+    return lang === 'en' ? place.nameEn : place.name;
+  }
+
   function cardEl(id) {
     const place = placesById.get(id);
     const el = document.createElement('div');
     el.className = 'card';
     el.dataset.id = id;
     el.style.setProperty('--hue', countryHue.get(place.country));
-    el.title = `${place.name} (${place.country})`;
+    el.title = `${placeName(place)} (${lang === 'en' ? place.countryEn : place.country})`;
 
     const img = document.createElement('img');
     img.src = `images/${id}.jpg`;
@@ -174,7 +178,7 @@
 
     const label = document.createElement('div');
     label.className = 'label';
-    label.textContent = `${place.flag} ${place.name}`;
+    label.textContent = `${place.flag} ${placeName(place)}`;
     el.appendChild(label);
     return el;
   }

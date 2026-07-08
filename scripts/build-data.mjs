@@ -22,6 +22,60 @@ const COUNTRY_FLAGS = {
   'Suíça': '🇨🇭',
 };
 
+const COUNTRY_EN = {
+  'França': 'France',
+  'Holanda': 'Netherlands',
+  'Bélgica': 'Belgium',
+  'Alemanha': 'Germany',
+  'República Tcheca': 'Czech Republic',
+  'Polônia': 'Poland',
+  'Eslováquia': 'Slovakia',
+  'Hungria': 'Hungary',
+  'Áustria': 'Austria',
+  'Eslovênia': 'Slovenia',
+  'Itália': 'Italy',
+  'Vaticano': 'Vatican City',
+  'Suíça': 'Switzerland',
+};
+
+// Nomes em inglês quando diferem do português; ausente = mesmo nome.
+const EN_NAMES = {
+  'Haia': 'The Hague',
+  'De Pier': 'Scheveningen Pier',
+  'Gante': 'Ghent',
+  'Bruxelas': 'Brussels',
+  'Colônia': 'Cologne',
+  'Hamburgo': 'Hamburg',
+  'Berlim': 'Berlin',
+  'Suíça Saxônica': 'Saxon Switzerland',
+  'Munique': 'Munich',
+  'Castelo de Neuschwanstein': 'Neuschwanstein Castle',
+  'Castelo de Hohenschwangau': 'Hohenschwangau Castle',
+  'Lago Alpsee': 'Lake Alpsee',
+  'Praga': 'Prague',
+  'Breslávia': 'Wrocław',
+  'Cracóvia': 'Kraków',
+  'Castelo de Devín': 'Devín Castle',
+  'Budapeste': 'Budapest',
+  'Viena': 'Vienna',
+  'Salzburgo': 'Salzburg',
+  'Liubliana': 'Ljubljana',
+  'Lago Bled': 'Lake Bled',
+  'Pompeia': 'Pompeii',
+  'Nápoles': 'Naples',
+  'Roma': 'Rome',
+  'Milão': 'Milan',
+  'Lago de Como': 'Lake Como',
+  'Veneza': 'Venice',
+  'Florença': 'Florence',
+  'Siracusa': 'Syracuse',
+  'Vaticano': 'Vatican City',
+  'Zurique': 'Zurich',
+  'Lucerna': 'Lucerne',
+  'Trümmelbachfälle': 'Trümmelbach Falls',
+  'Lago Brienz': 'Lake Brienz',
+};
+
 export function slugify(name) {
   return name
     .normalize('NFD')
@@ -47,7 +101,14 @@ for (const raw of lines) {
     console.error(`Local "${line}" apareceu antes de qualquer país — ignorando.`);
     continue;
   }
-  places.push({ id: slugify(line), name: line, country, flag: COUNTRY_FLAGS[country] });
+  places.push({
+    id: slugify(line),
+    name: line,
+    nameEn: EN_NAMES[line] ?? line,
+    country,
+    countryEn: COUNTRY_EN[country],
+    flag: COUNTRY_FLAGS[country],
+  });
 }
 
 const dupes = places.map(p => p.id).filter((id, i, a) => a.indexOf(id) !== i);
