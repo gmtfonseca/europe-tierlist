@@ -137,6 +137,7 @@ main { padding: 20px; max-width: 1400px; margin: 0 auto; }
   background: hsl(var(--hue, 220) 30% 32%);
   user-select: none;
   -webkit-user-select: none;
+  -webkit-touch-callout: none; /* iOS: sem menu de "salvar imagem" no toque longo que inicia o arrasto */
   flex: none;
 }
 
@@ -235,3 +236,34 @@ main { padding: 20px; max-width: 1400px; margin: 0 auto; }
 @media (max-width: 900px) {
   .compare-columns { grid-template-columns: 1fr; }
 }
+
+/* ---------- Mobile ---------- */
+
+@media (max-width: 640px) {
+  :root { --card-size: 78px; --card-size-mini: 54px; }
+
+  header { padding: 8px 10px; gap: 8px; }
+  header h1 { font-size: 16px; margin-right: 0; }
+  #tabs { order: 3; width: 100%; }
+  .tab { padding: 6px 12px; font-size: 13px; flex: 1; text-align: center; }
+  .actions { margin-left: auto; }
+  .actions button { padding: 6px 10px; font-size: 12px; }
+
+  main { padding: 10px; }
+
+  .tier-row { margin-bottom: 6px; border-radius: 8px; }
+  .tier-label { flex: 0 0 40px; font-size: 20px; }
+  .tier-drop { padding: 4px; gap: 4px; }
+
+  .pool { padding: 6px; gap: 4px; }
+
+  .card { border-radius: 6px; }
+  .card .label { font-size: 9.5px; padding: 12px 4px 4px; }
+  .card.no-img .label { font-size: 10px; }
+
+  .disagreement { gap: 10px; padding: 6px 10px; flex-wrap: wrap; }
+  .disagreement .who { width: 100%; text-align: left; margin-left: 0; }
+}
+
+/* Toque: sem atraso de 300ms nem zoom por duplo toque nos controles */
+button, .card { touch-action: manipulation; }

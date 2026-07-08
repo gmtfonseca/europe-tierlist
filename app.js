@@ -168,6 +168,10 @@
         new Sortable(zone, {
           group: 'tierlist',
           animation: 150,
+          // No toque: segurar ~150ms inicia o arrasto; antes disso o dedo rola a página normalmente.
+          delay: 150,
+          delayOnTouchOnly: true,
+          touchStartThreshold: 4,
           onEnd: () => syncFromDom(profileIdx),
         })
       );
