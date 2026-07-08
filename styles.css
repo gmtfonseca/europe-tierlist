@@ -242,7 +242,7 @@ main { padding: 20px; max-width: 1400px; margin: 0 auto; }
 @media (max-width: 640px) {
   :root { --card-size: 78px; --card-size-mini: 54px; }
 
-  header { padding: 8px 10px; gap: 8px; }
+  header { padding: 8px 10px; gap: 8px; position: static; }
   header h1 { font-size: 16px; margin-right: 0; }
   #tabs { order: 3; width: 100%; }
   .tab { padding: 6px 12px; font-size: 13px; flex: 1; text-align: center; }
