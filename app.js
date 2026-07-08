@@ -3,6 +3,61 @@
   'use strict';
 
   const STORAGE_KEY = 'europe-tierlist:v1';
+  const LANG_KEY = 'europe-tierlist:lang';
+
+  const I18N = {
+    pt: {
+      compareTab: 'Comparação',
+      export: 'Exportar',
+      exportTitle: 'Baixar o estado como JSON',
+      import: 'Importar',
+      importTitle: 'Restaurar estado de um JSON exportado',
+      reset: 'Resetar',
+      resetTitle: 'Apagar tudo e recomeçar',
+      langTitle: 'Switch to English',
+      unranked: n => `Não rankeados (${n})`,
+      stillUnranked: (a, na, b, nb) => `Ainda não rankeados — ${a}: ${na} · ${b}: ${nb}`,
+      disagreements: 'Maiores discordâncias',
+      noDisagreements: 'Nenhuma discordância — vocês concordam em tudo! 🎉',
+      noneRankedByBoth: 'Nenhum local rankeado pelos dois ainda.',
+      coupleTitle: n => `Tierlist do casal (${n} locais rankeados pelos dois)`,
+      resetConfirm: 'Apagar as duas tierlists e recomeçar do zero?',
+      mergeConfirm:
+        'Mesclar com as tierlists atuais?\n\n' +
+        'OK = mesclar: para cada perfil, vale a versão com mais locais rankeados ' +
+        '(ideal para importar a tierlist da outra pessoa sem perder a sua).\n' +
+        'Cancelar = substituir tudo pelo arquivo.',
+      importError: m => `Não foi possível importar: ${m}`,
+      invalidStructure: 'estrutura inválida',
+    },
+    en: {
+      compareTab: 'Comparison',
+      export: 'Export',
+      exportTitle: 'Download the state as JSON',
+      import: 'Import',
+      importTitle: 'Restore state from an exported JSON',
+      reset: 'Reset',
+      resetTitle: 'Erase everything and start over',
+      langTitle: 'Mudar para português',
+      unranked: n => `Unranked (${n})`,
+      stillUnranked: (a, na, b, nb) => `Still unranked — ${a}: ${na} · ${b}: ${nb}`,
+      disagreements: 'Biggest disagreements',
+      noDisagreements: 'No disagreements — you agree on everything! 🎉',
+      noneRankedByBoth: 'No place ranked by both yet.',
+      coupleTitle: n => `Couple's tierlist (${n} places ranked by both)`,
+      resetConfirm: 'Erase both tierlists and start from scratch?',
+      mergeConfirm:
+        'Merge with the current tierlists?\n\n' +
+        'OK = merge: for each profile, the version with more ranked places wins ' +
+        "(ideal for importing the other person's tierlist without losing yours).\n" +
+        'Cancel = replace everything with the file.',
+      importError: m => `Could not import: ${m}`,
+      invalidStructure: 'invalid structure',
+    },
+  };
+
+  let lang = localStorage.getItem(LANG_KEY) === 'en' ? 'en' : 'pt';
+  const t = key => I18N[lang][key];
   const TIERS = [
     { key: 'S', color: '#ff7f7e' },
     { key: 'A', color: '#ffbf7f' },
@@ -158,7 +213,7 @@
     pool.dataset.pool = '1';
     const ranked = rankedIds(profile);
     const poolIds = state.poolOrder.filter(id => !ranked.has(id));
-    h2.textContent = `Não rankeados (${poolIds.length})`;
+    h2.textContent = t('unranked')(poolIds.length);
     for (const id of poolIds) pool.appendChild(cardEl(id));
     poolSection.append(h2, pool);
     view.appendChild(poolSection);
@@ -197,7 +252,7 @@
     state.poolOrder = [...poolIds, ...state.poolOrder.filter(id => !inPool.has(id))];
     save();
     const h2 = view.querySelector('.pool-section h2');
-    h2.textContent = `Não rankeados (${poolIds.length})`;
+    h2.textContent = t('unranked')(poolIds.length);
   }
 
   // ---------- Comparação ----------
@@ -240,9 +295,7 @@
 
     const counts = document.createElement('p');
     counts.className = 'compare-counts';
-    counts.textContent =
-      `Ainda não rankeados — ${p0.name}: ${PLACES.length - idx0.size} · ` +
-      `${p1.name}: ${PLACES.length - idx1.size}`;
+    counts.textContent = t('stillUnranked')(p0.name, PLACES.length - idx0.size, p1.name, PLACES.length - idx1.size);
     view.appendChild(counts);
 
     // 1. Lado a lado
@@ -267,14 +320,12 @@
     const disSection = document.createElement('section');
     disSection.className = 'compare-section';
     const disH2 = document.createElement('h2');
-    disH2.textContent = 'Maiores discordâncias';
+    disH2.textContent = t('disagreements');
     disSection.appendChild(disH2);
     if (!disagreements.length) {
       const note = document.createElement('p');
       note.className = 'empty-note';
-      note.textContent = both.length
-        ? 'Nenhuma discordância — vocês concordam em tudo! 🎉'
-        : 'Nenhum local rankeado pelos dois ainda.';
+      note.textContent = both.length ? t('noDisagreements') : t('noneRankedByBoth');
       disSection.appendChild(note);
     } else {
       const list = document.createElement('div');
@@ -309,7 +360,7 @@
     const coupleSection = document.createElement('section');
     coupleSection.className = 'compare-section';
     const coupleH2 = document.createElement('h2');
-    coupleH2.textContent = `Tierlist do casal (${both.length} locais rankeados pelos dois)`;
+    coupleH2.textContent = t('coupleTitle')(both.length);
     coupleSection.append(coupleH2, miniBoard(coupleTiers));
     view.appendChild(coupleSection);
   }
@@ -329,7 +380,7 @@
     });
     const cmp = document.createElement('button');
     cmp.className = 'tab' + (activeTab === 'compare' ? ' active' : '');
-    cmp.textContent = 'Comparação';
+    cmp.textContent = t('compareTab');
     cmp.addEventListener('click', () => { if (activeTab !== 'compare') { activeTab = 'compare'; render(); } });
     tabs.appendChild(cmp);
   }
@@ -355,13 +406,33 @@
     });
   }
 
+  function renderHeaderButtons() {
+    const setBtn = (id, label, title) => {
+      const btn = document.getElementById(id);
+      btn.textContent = label;
+      btn.title = title;
+    };
+    setBtn('btn-lang', lang === 'pt' ? 'EN' : 'PT', t('langTitle'));
+    setBtn('btn-export', t('export'), t('exportTitle'));
+    setBtn('btn-import', t('import'), t('importTitle'));
+    setBtn('btn-reset', t('reset'), t('resetTitle'));
+    document.documentElement.lang = lang === 'pt' ? 'pt-BR' : 'en';
+  }
+
   function render() {
+    renderHeaderButtons();
     renderTabs();
     if (activeTab === 'compare') renderCompare();
     else renderBoard(activeTab);
   }
 
   // ---------- Exportar / Importar / Resetar ----------
+
+  document.getElementById('btn-lang').addEventListener('click', () => {
+    lang = lang === 'pt' ? 'en' : 'pt';
+    localStorage.setItem(LANG_KEY, lang);
+    render();
+  });
 
   document.getElementById('btn-export').addEventListener('click', () => {
     const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
@@ -380,17 +451,9 @@
     if (!file) return;
     try {
       const incoming = sanitizeState(JSON.parse(await file.text()));
-      if (!incoming) throw new Error('estrutura inválida');
+      if (!incoming) throw new Error(t('invalidStructure'));
       const hasLocal = state.profiles.some(p => rankedCount(p) > 0);
-      if (
-        hasLocal &&
-        confirm(
-          'Mesclar com as tierlists atuais?\n\n' +
-            'OK = mesclar: para cada perfil, vale a versão com mais locais rankeados ' +
-            '(ideal para importar a tierlist da outra pessoa sem perder a sua).\n' +
-            'Cancelar = substituir tudo pelo arquivo.'
-        )
-      ) {
+      if (hasLocal && confirm(t('mergeConfirm'))) {
         state.profiles = state.profiles.map((local, i) =>
           rankedCount(incoming.profiles[i]) > rankedCount(local) ? incoming.profiles[i] : local
         );
@@ -401,12 +464,12 @@
       activeTab = 0;
       render();
     } catch (err) {
-      alert(`Não foi possível importar: ${err.message}`);
+      alert(t('importError')(err.message));
     }
   });
 
   document.getElementById('btn-reset').addEventListener('click', () => {
-    if (!confirm('Apagar as duas tierlists e recomeçar do zero?')) return;
+    if (!confirm(t('resetConfirm'))) return;
     state = defaultState();
     save();
     activeTab = 0;
